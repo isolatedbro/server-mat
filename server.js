@@ -8,7 +8,7 @@ dotenv.config();
 connectDB();
 const app = express();
 
-const allowedOrigins = ["https://isolatedbro.github.io/", "http://localhost:5173"];
+const allowedOrigins = ["https://isolatedbro.github.io"];
 app.use(
   cors({
     origin(origin, callback) {
