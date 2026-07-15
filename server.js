@@ -9,7 +9,6 @@ connectDB();
 const app = express();
 
 const allowedOrigins = [
-  "http://localhost:5173",
   "https://isolatedbro.github.io/matrimony-project",
 ];
 app.use(
