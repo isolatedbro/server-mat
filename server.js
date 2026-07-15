@@ -8,9 +8,7 @@ dotenv.config();
 connectDB();
 const app = express();
 
-const allowedOrigins = [
-  "https://isolatedbro.github.io/matrimony-project",
-];
+const allowedOrigins = ["https://isolatedbro.github.io/"];
 app.use(
   cors({
     origin(origin, callback) {
@@ -26,7 +24,6 @@ app.use(
   }),
 );
 app.use(express.json());
-
 
 app.use("/users", userRoutes);
 app.use("/auth", authRouter);
