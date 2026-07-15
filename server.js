@@ -3,17 +3,18 @@ import cors from "cors";
 import dotenv from "dotenv";
 import userRoutes from "./src/routes/userRoutes.js";
 import connectDB from "./src/config/database.js";
+import authRouter from "./src/routes/authRoutes.js";
 dotenv.config();
 connectDB();
 const app = express();
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  "https://isolatedbro.github.io",
+  "https://isolatedbro.github.io/matrimony-project",
 ];
 app.use(
   cors({
     origin(origin, callback) {
+      // console.log("Origin", origin);
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
@@ -26,10 +27,9 @@ app.use(
 );
 app.use(express.json());
 
-// app.get("/", (req, res) => {
-//   res.json({message:"Hello, World!"});
-// });
+
 app.use("/users", userRoutes);
+app.use("/auth", authRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

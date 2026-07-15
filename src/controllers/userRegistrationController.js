@@ -1,6 +1,8 @@
 import User from "../models/User.js";
+import jwt from "jsonwebtoken";
 
 export const newUserRegistration = async (req, res) => {
+  const sendError = [];
   try {
     const {
       firstName,
@@ -13,24 +15,19 @@ export const newUserRegistration = async (req, res) => {
       confirmPassword,
     } = req.body;
 
-    console.log(typeof gender);
     if (password !== confirmPassword) {
-      return res.status(400).json({ message: "Passwords do not match" });
+      return res.status(400).json({ message: "Passwords do not match !!!" });
     }
-
-    console.log(req.body);
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "User with this email already exists" });
+      sendError.push("User with this email already exists !!!");
+      return res.status(400).json({ error: sendError });
     }
     const existingPhoneNumber = await User.findOne({ phoneNumber });
     if (existingPhoneNumber) {
-      return res
-        .status(400)
-        .json({ message: "User with this phone number already exists" });
+      sendError.push("User with this phone Number already exists !!!");
+      return res.status(400).json({ error: sendError });
     }
 
     const newUser = new User({
@@ -42,11 +39,47 @@ export const newUserRegistration = async (req, res) => {
       phoneNumber,
       password,
     });
+
+    
     await newUser.save();
 
-    res.status(201).json({ message: "User registered successfully" });
+    const isExist = await User.findOne({
+      $or: [{ email: email, phoneNumber: phoneNumber }],
+    });
+
+    const token = jwt.sign(
+      {
+        userId: isExist._id,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "120h",
+      },
+    );
+
+    res.status(201).json({token});
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    const errors = error.errors;
+    // console.log(errors);
+
+    if (errors?.firstName !== undefined) {
+      sendError.push("Minimum 3 characters requred in first Name !!!");
+    }
+    if (errors?.lastName !== undefined) {
+      sendError.push("Minimum 3 characters requred in last name !!!");
+    }
+    if (errors?.gender !== undefined) {
+      sendError.push("Gender is required !!!");
+    }
+    if (errors?.dateOfBirth !== undefined) {
+      sendError.push("Date of Birth is required !!!");
+    }
+    if (errors?.email !== undefined) {
+      sendError.push("Email not provided or invalid email !!!");
+    }
+    if (errors?.phoneNumber !== undefined) {
+      sendError.push("Phone Number not provided or Invalid Phone Number !!!");
+    }
+    res.status(500).json({ error: sendError });
   }
 };
