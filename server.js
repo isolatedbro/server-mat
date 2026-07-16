@@ -8,7 +8,10 @@ dotenv.config();
 connectDB();
 const app = express();
 
-const allowedOrigins = ["https://isolatedbro.github.io", "https://matrimony-project-wy7n.onrender.com"];
+const allowedOrigins = [
+  "https://isolatedbro.github.io",
+  "https://matrimony-project-pq2p.onrender.com",
+];
 app.use(
   cors({
     origin(origin, callback) {
