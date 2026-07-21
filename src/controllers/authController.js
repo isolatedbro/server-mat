@@ -4,9 +4,15 @@ import User from "../models/User.js";
 export const userLogin = async (req, res, next) => {
   try {
     const { email, phoneNumber, password } = req.body;
-    const userInput = phoneNumber.length !== 0 ? phoneNumber : email;
+    console.log("EMAIL", email, "PHONE", phoneNumber, "PASS", password)
+    const userInput = phoneNumber?.trim()
+    ? phoneNumber.trim()
+    : email?.trim();
     const isExist = await User.findOne({
-      $or: [{ email: email, phoneNumber: phoneNumber }],
+      $or: [
+    { email },
+    { phoneNumber }
+  ],
     });
     if (!isExist) {
       return res.status(401).json({ error: ["Invalid credentials"] });
@@ -38,6 +44,7 @@ export const userLogin = async (req, res, next) => {
     //     }
     // }
   } catch (error) {
+    console.log("Auhtentication Failed during LOGIN");
     res.status(401).json({ error: ["Authentication Failed"] });
   }
 };
