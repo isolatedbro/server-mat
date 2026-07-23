@@ -9,7 +9,7 @@ const userRouter = express.Router();
 
 userRouter.get('/profile', authMiddleware, getProfile);
 userRouter.get('/get', authMiddleware, getUsers);
-userRouter.get('/user', authMiddleware, getSingleUser)
+userRouter.get('/user/:userId', authMiddleware, getSingleUser);
 userRouter.post(
   "/update",
   authMiddleware,

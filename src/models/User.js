@@ -98,6 +98,10 @@ const userRegistrationSchema = new mongoose.Schema({
     // required: true,
     default: "",
   },
+  college: {
+    type: String,
+    default: "",
+  },
   occupation: {
     type: String,
     // required: true,
@@ -141,6 +145,10 @@ const userRegistrationSchema = new mongoose.Schema({
   gallery: {
     type: [mongoose.Schema.Types.Mixed],
     default: [],
+  },
+  aboutMe: {
+    type: String,
+    default: "",
   },
 });
 const User = mongoose.model("User", userRegistrationSchema);

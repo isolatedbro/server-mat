@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 const authMiddleware = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
+    // console.log(authHeader);
     if (!authHeader) {
       console.log("Auth Header Not Found")
       return res.status(401).json({ error: ["Authentication Failed !!!"] });

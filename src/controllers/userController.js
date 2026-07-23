@@ -9,22 +9,42 @@ import Match from "../models/Match.js";
 export const getProfile = async (req, res) => {
   try {
     // console.log("REQ.USER",req.user);
-    res.json({ user: req.user.userId });
+    const user = await User.findById(req.user.userId);
+    res.json({
+      userId: req.user.userId,
+      name: user.firstName + " " + user.lastName,
+    });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 export const getSingleUser = async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req.user.userId });
+    // console.log(req.params)
+    const user = await User.findOne({ _id: req.params.userId });
+    // console.log(user)
     res.json(user);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 export const getUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const matchData = await Match.findById(req.user.userId);
+    // const excludedIds = matchData
+    //   ? matchData.requests
+    //       .filter((req) => ["pending", "accepted"].includes(req.status))
+    //       .map((req) => req._id)
+    //   : [];
+    const excludeIds = matchData
+      ? matchData?.requests?.map((req) => req.userId)
+      : [];
+    const user = await User.findById(req.user.userId);
+    const users = await User.find({
+      _id: { $nin: excludeIds },
+      gender: { $ne: user.gender },
+    });
     // console.log(typeof users[0].phoneNumber);
     res.json(users);
   } catch (error) {
@@ -102,10 +122,10 @@ export const deleteGalleryImage = async (req, res) => {
 
 export const sendRequest = async (req, res) => {
   try {
-    const { from, to } = req.body;
+    const { from, to, status } = req.body;
     const isExist = await Match.findById(to);
     if (!isExist) {
-      const requests = [{ userId: from }];
+      const requests = [{ userId: from, status: status }];
       const newRequest = new Match({
         _id: to,
         requests,
@@ -121,7 +141,34 @@ export const sendRequest = async (req, res) => {
           $push: {
             requests: {
               userId: from,
-              status: "pending",
+              status: status,
+            },
+          },
+        },
+        { upsert: true, returnDocument: "after", runValidators: true },
+      );
+    }
+    const isSenderExist = await Match.findById(from);
+    if (!isSenderExist) {
+      const requests = [
+        { userId: to, status: status === "pending" ? "awaiting" : "ignored" },
+      ];
+      const newRequest = new Match({
+        _id: from,
+        requests,
+      });
+      await newRequest.save();
+    } else {
+      const requests = isExist?.requests;
+      // requests.push({ userId: from });
+
+      await Match.findByIdAndUpdate(
+        from,
+        {
+          $push: {
+            requests: {
+              userId: to,
+              status: status === "pending" ? "awaiting" : "ignored",
             },
           },
         },
@@ -177,6 +224,18 @@ export const updateRequest = async (req, res) => {
         },
       },
     );
+
+    await Match.updateOne(
+      {
+        _id: userId,
+        "requests.userId": req.user.userId,
+      },
+      {
+        $set: {
+          "requests.$.status": status,
+        },
+      },
+    );
     res.json({ message: "Status updated" });
   } catch (error) {
     console.log("Error in updateRequest", error);
@@ -185,8 +244,8 @@ export const updateRequest = async (req, res) => {
 };
 
 // GET MATCHED REQUEST
-export const getMatch = async(req,res) => {
-  try{
+export const getMatch = async (req, res) => {
+  try {
     const reqObject = await Match.findById(req.user.userId);
 
     // console.log("REQOBJ", reqObject);
@@ -204,9 +263,8 @@ export const getMatch = async(req,res) => {
       }
     }
     res.json(match);
-
-  }catch(error){
+  } catch (error) {
     console.log("Error in getMacth", error);
     res.json({ error: error });
   }
-}
+};
