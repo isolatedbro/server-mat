@@ -40,6 +40,7 @@ export const getUsers = async (req, res) => {
     const excludeIds = matchData
       ? matchData?.requests?.map((req) => req.userId)
       : [];
+      // console.log("EXLUDE---",excludeIds);
     const user = await User.findById(req.user.userId);
     const users = await User.find({
       _id: { $nin: excludeIds },
@@ -213,6 +214,7 @@ export const updateRequest = async (req, res) => {
     // const reqObject = await Match.find({
     //   _id: req.user.userId,
     // });
+    // console.log(status, userId);
     await Match.updateOne(
       {
         _id: req.user.userId,

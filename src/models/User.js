@@ -1,4 +1,144 @@
 import mongoose from "mongoose";
+const occupationCategories = {
+  // Information Technology
+  "Software Engineer": "Information Technology",
+  "Software Developer": "Information Technology",
+  "Web Developer": "Information Technology",
+  "Web Designer": "Information Technology",
+  "UI/UX Designer": "Information Technology",
+  "Data Scientist": "Information Technology",
+  "Data Analyst": "Information Technology",
+  "Business Analyst": "Information Technology",
+  "Hardware Engineer": "Information Technology",
+  "Computer Operator": "Information Technology",
+  "Quality Assurance Engineer": "Information Technology",
+
+  // Engineering
+  "Civil Engineer": "Engineering",
+  "Mechanical Engineer": "Engineering",
+  "Electrical Engineer": "Engineering",
+  "Electronics Engineer": "Engineering",
+  Architect: "Engineering",
+  Biotechnologist: "Engineering",
+  Technician: "Engineering",
+
+  // Healthcare & Medical
+  Doctor: "Healthcare & Medical",
+  Physician: "Healthcare & Medical",
+  Dentist: "Healthcare & Medical",
+  Nurse: "Healthcare & Medical",
+  Pharmacist: "Healthcare & Medical",
+  Psychologist: "Healthcare & Medical",
+  Veterinarian: "Healthcare & Medical",
+
+  // Education & Research
+  Teacher: "Education & Research",
+  Professor: "Education & Research",
+  Lecturer: "Education & Research",
+  "Research Scholar": "Education & Research",
+  "Research Scientist": "Education & Research",
+  Scientist: "Education & Research",
+
+  // Finance & Accounting
+  Accountant: "Finance & Accounting",
+  "CA / Chartered Accountant": "Finance & Accounting",
+  Auditor: "Finance & Accounting",
+  "Banking Professional": "Finance & Accounting",
+  "Finance Professional": "Finance & Accounting",
+  "Insurance Professional": "Finance & Accounting",
+  Cashier: "Finance & Accounting",
+
+  // Business & Entrepreneurship
+  "Business Owner": "Business & Entrepreneurship",
+  Entrepreneur: "Business & Entrepreneurship",
+  "Self Employed": "Business & Entrepreneurship",
+  "Shop Owner": "Business & Entrepreneurship",
+  Trader: "Business & Entrepreneurship",
+  Contractor: "Business & Entrepreneurship",
+
+  // Government & Public Services
+  "Government Employee": "Government & Public Services",
+  "Police Officer": "Government & Public Services",
+  Judge: "Government & Public Services",
+  Politician: "Government & Public Services",
+  "Railway Employee": "Government & Public Services",
+  Clerk: "Government & Public Services",
+  "Administration Professional": "Government & Public Services",
+
+  // Defence & Aviation
+  "Army Personnel": "Defence & Aviation",
+  "Military Personnel": "Defence & Aviation",
+  "Navy Personnel": "Defence & Aviation",
+  "Merchant Navy": "Defence & Aviation",
+  Pilot: "Defence & Aviation",
+  "Air Hostess / Flight Attendant": "Defence & Aviation",
+
+  // Legal
+  Lawyer: "Legal",
+  "Legal Professional": "Legal",
+  "Company Secretary": "Legal",
+
+  // Sales, Marketing & Management
+  "Marketing Professional": "Sales, Marketing & Management",
+  "Sales Professional": "Sales, Marketing & Management",
+  "Management Professional": "Sales, Marketing & Management",
+  "Project Manager": "Sales, Marketing & Management",
+  "Operations Professional": "Sales, Marketing & Management",
+  Executive: "Sales, Marketing & Management",
+  Consultant: "Sales, Marketing & Management",
+  "HR Professional": "Sales, Marketing & Management",
+  "Customer Support Professional": "Sales, Marketing & Management",
+  "Public Relations Professional": "Sales, Marketing & Management",
+  "Advertising Professional": "Sales, Marketing & Management",
+  "Event Manager": "Sales, Marketing & Management",
+
+  // Arts, Media & Design
+  Actor: "Arts, Media & Design",
+  Artist: "Arts, Media & Design",
+  Designer: "Arts, Media & Design",
+  "Graphic Designer": "Arts, Media & Design",
+  "Fashion Designer": "Arts, Media & Design",
+  "Interior Designer": "Arts, Media & Design",
+  Photographer: "Arts, Media & Design",
+  "Video Editor": "Arts, Media & Design",
+  "Content Writer": "Arts, Media & Design",
+  Writer: "Arts, Media & Design",
+  Journalist: "Arts, Media & Design",
+  Model: "Arts, Media & Design",
+
+  // Hospitality & Tourism
+  Chef: "Hospitality & Tourism",
+  "Hotel & Hospitality Professional": "Hospitality & Tourism",
+  Receptionist: "Hospitality & Tourism",
+  Beautician: "Hospitality & Tourism",
+
+  // Manufacturing & Industrial
+  "Machine Operator": "Manufacturing & Industrial",
+  Driver: "Manufacturing & Industrial",
+  "Textile Professional": "Manufacturing & Industrial",
+
+  // Agriculture
+  Farmer: "Agriculture",
+
+  // Social Services
+  "Social Worker": "Social Services",
+
+  // Sports
+  "Sports Person": "Sports",
+
+  // Student
+  Student: "Student",
+
+  // Retired
+  Retired: "Retired",
+
+  // Unemployed
+  Unemployed: "Unemployed",
+
+  // Other
+  Other: "Others",
+};
+
 const userRegistrationSchema = new mongoose.Schema({
   // Do not remove spaces in empty string in default value;
   firstName: {
@@ -107,6 +247,10 @@ const userRegistrationSchema = new mongoose.Schema({
     // required: true,
     default: "",
   },
+  occupationCategory: {
+    type: String,
+    default: "",
+  },
   annualIncome: {
     type: String,
     // required: true,
@@ -151,5 +295,12 @@ const userRegistrationSchema = new mongoose.Schema({
     default: "",
   },
 });
+
+userRegistrationSchema.pre("save", function (next) {
+  this.occupationCategory = occupationCategories[this.occupation] || "Others";
+
+  next();
+});
+
 const User = mongoose.model("User", userRegistrationSchema);
 export default User;

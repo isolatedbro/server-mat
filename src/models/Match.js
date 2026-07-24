@@ -16,7 +16,7 @@ const MatchRequestSchema = new mongoose.Schema({
       },
       status: {
         type: String,
-        enum: ["pending", "accepted", "rejected", "cancelled", "awaiting, ignored"],
+        enum: ["pending", "accepted", "rejected", "cancelled", "awaiting", "ignored"],
       },
       sentAt: {
         type: Date,
